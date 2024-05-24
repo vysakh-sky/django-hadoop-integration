@@ -35,8 +35,12 @@ class HadoopStorage(Storage):
         return name
     
     def delete(self, name):
+        # Implemented using signals
         # delete the file referenced by name
-        print(f'deleting name - {name}')
+        # self.client.delete(name)
+        pass
+
+    def delete_signal(self, name):
         self.client.delete(name)
 
     def exists(self, name):
@@ -55,3 +59,5 @@ class HadoopStorage(Storage):
     def url(self, name):
         # return url where contents of file can be accessed
         return f'http://{self.hadoop_host}:{self.hadoop_port}/webhdfs/v1/user/{self.hadoop_user}/{name}?op=OPEN&user.name={self.hadoop_user}'
+    
+
