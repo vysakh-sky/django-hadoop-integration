@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Article List</title>
+</head>
+<body>
+    <h1>Articles</h1>
+    <hr>
+{% if article_list %}
+    {% for article in article_list %}
+    <h3>{{ article.headline }}</h3>
+    <img src="{{ article.attachment.url }}" width="300" alt="{{ article.attachment }}">
+    <hr>
+    {% endfor %}
+{% else %}
+<p>There are no articles in the db.</p>
+{% endif %}
+
+    
+</body>
+</html>
