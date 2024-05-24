@@ -26,5 +26,5 @@ Instructions to setup a Fully Distributed Cluster can be found [here](https://ha
 
 ## Notes
 
-- **Insecure WebHDFS**: The current implementation uses insecure WebHDFS.
+- **Insecure WebHDFS**: The current implementation uses insecure [WebHDFS](https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html) or [HttpFS](https://hadoop.apache.org/docs/current/hadoop-hdfs-httpfs/) API.
 - **Delete Functionality**: The delete functionality does not currently remove the file from the Hadoop cluster. This needs to be fixed.
