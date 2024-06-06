@@ -124,6 +124,7 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # HADOOP WebHDFS/HttpFS Config
-HADOOP_HOST = 'localhost'
+HADOOP_HOST = 'node1.hdfs.skylarklabs.ai'
 HADOOP_PORT = 14000
-HADOOP_USER = 'john'
+HADOOP_USER = 'hdfs'
+HADOOP_SECURE = True

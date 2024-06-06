@@ -11,6 +11,8 @@ from hdfs import InsecureClient
 from django.utils.deconstruct import deconstructible
 from django.core.files.storage import Storage
 from django.conf import settings
+from hdfs.ext.kerberos import KerberosClient
+
 
 
 
@@ -20,7 +22,13 @@ class HadoopStorage(Storage):
         self.hadoop_host = getattr(settings, 'HADOOP_HOST', 'localhost')
         self.hadoop_port = getattr(settings, 'HADOOP_PORT', 14000)
         self.hadoop_user = getattr(settings, 'HADOOP_USER', 'john')
-        self.client = InsecureClient(f'http://{self.hadoop_host}:{self.hadoop_port}', user=self.hadoop_user)
+        self.hadoop_secure = getattr(settings, 'HADOOP_SECURE', 'false')
+
+        if self.hadoop_secure:
+            self.client = KerberosClient(f'http://{self.hadoop_host}:{self.hadoop_port}')
+        else:
+            self.client = InsecureClient(f'http://{self.hadoop_host}:{self.hadoop_port}', user=self.hadoop_user)
+
 
 
     # def _open(self, name, mode='rb'):
@@ -58,6 +66,7 @@ class HadoopStorage(Storage):
 
     def url(self, name):
         # return url where contents of file can be accessed
-        return f'http://{self.hadoop_host}:{self.hadoop_port}/webhdfs/v1/user/{self.hadoop_user}/{name}?op=OPEN&user.name={self.hadoop_user}'
+        return f'http://{self.hadoop_host}:{self.hadoop_port}/webhdfs/v1/user/{self.hadoop_user}/{name}?op=OPEN' # Need to append authentication query param when rendering on client side, either user.name for simple auth, or delegation token for kerberos
+        # return f'http://{self.hadoop_host}:{self.hadoop_port}/webhdfs/v1/user/{self.hadoop_user}/{name}?op=OPEN&user.name={self.hadoop_user}'
     
 
