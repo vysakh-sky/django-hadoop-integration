@@ -11,6 +11,7 @@ Django application that implements file storage on a Apache Hadoop cluster.
    HADOOP_USER = 'your_hadoop_user'
    HADOOP_HOST = 'your_hadoop_host'
    HADOOP_PORT = 'your_hadoop_port'
+   HADOOP_SECURE = True # If your cluster uses Kerberos Authentication. Else, False for simple auth.
    ```
 
 5. Create superuser ```python manage.py createsuperuser```
