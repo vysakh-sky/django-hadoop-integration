@@ -34,7 +34,6 @@ class HadoopStorage(Storage):
     # def _open(self, name, mode='rb'):
     #   pass
 
-
     def _save(self, name, content):
         # Save the file to HDFS
         with self.client.write(name, overwrite=True) as writer:
@@ -42,15 +41,23 @@ class HadoopStorage(Storage):
 
         return name
     
+    def save(self, file_id, name, content):
+        # adding here file_id into the file path to ensure uniqueness
+        file_path = f'{file_id}_{name}'
+        # Save the file to HDFS
+        with self.client.write(file_path, overwrite=True) as writer:
+            writer.write(content.read())
+        return file_path
+
+    def update(self, file_id, name, content):
+        # Update the file in HDFS
+        return self.save(file_id, name, content)
+    
     def delete(self, name):
         # Implemented using signals
         # delete the file referenced by name
         # self.client.delete(name)
         pass
-    
-    def update(self, name, content):
-        # Update the file in HDFS
-        return self._save(name, content)
 
     def delete_signal(self, name):
         self.client.delete(name)
@@ -72,5 +79,3 @@ class HadoopStorage(Storage):
         # return url where contents of file can be accessed
         return f'http://{self.hadoop_host}:{self.hadoop_port}/webhdfs/v1/user/{self.hadoop_user}/{name}?op=OPEN' # Need to append authentication query param when rendering on client side, either user.name for simple auth, or delegation token for kerberos
         # return f'http://{self.hadoop_host}:{self.hadoop_port}/webhdfs/v1/user/{self.hadoop_user}/{name}?op=OPEN&user.name={self.hadoop_user}'
-    
-

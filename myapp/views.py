@@ -38,18 +38,23 @@ class ArticleListView(generic.ListView):
 @method_decorator(require_http_methods(["PUT"]), name='dispatch')
 class UpdateFileView(View):
     def put(self, request, *args, **kwargs):
-        # Extract the file path and file content from the request
-        file_path = request.GET.get('file_path')
+        # Extract the ID from the URL
+        file_id = kwargs.get('id')
+        
+        # Extract the file name from the query parameters
+        file_name = request.GET.get('file_name')
+        if not file_name:
+            return HttpResponseBadRequest("file_name is required.")
+        
         file_content = request.FILES.get('file')
-
-        if not file_path or not file_content:
-            return HttpResponseBadRequest("file_path and file are required.")
+        if not file_content:
+            return HttpResponseBadRequest("file is required.")
 
         storage = HadoopStorage()
 
         # Update the file in HDFS
         try:
-            storage.update(file_path, file_content)
+            storage.update(file_id, file_name, file_content)
             return JsonResponse({'message': 'File updated successfully.'})
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
