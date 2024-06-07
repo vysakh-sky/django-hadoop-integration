@@ -47,6 +47,10 @@ class HadoopStorage(Storage):
         # delete the file referenced by name
         # self.client.delete(name)
         pass
+    
+    def update(self, name, content):
+        # Update the file in HDFS
+        return self._save(name, content)
 
     def delete_signal(self, name):
         self.client.delete(name)
