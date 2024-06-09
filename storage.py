@@ -41,18 +41,6 @@ class HadoopStorage(Storage):
 
         return name
     
-    def save(self, file_id, name, content):
-        # adding here file_id into the file path to ensure uniqueness
-        file_path = f'{file_id}_{name}'
-        # Save the file to HDFS
-        with self.client.write(file_path, overwrite=True) as writer:
-            writer.write(content.read())
-        return file_path
-
-    def update(self, file_id, name, content):
-        # Update the file in HDFS
-        return self.save(file_id, name, content)
-    
     def delete(self, name):
         # Implemented using signals
         # delete the file referenced by name

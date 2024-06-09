@@ -11,6 +11,7 @@ import requests
 from requests_gssapi import HTTPSPNEGOAuth
 from storage import HadoopStorage 
 from django.views import View
+from django.shortcuts import get_object_or_404
 
 
 def index(request):
@@ -34,27 +35,31 @@ class ArticleListView(generic.ListView):
             context['auth'] = f'user.name={hadoop_user}'
 
         return context
-    
-@method_decorator(require_http_methods(["PUT"]), name='dispatch')
+
+@method_decorator(require_http_methods(["POST", "GET"]), name='dispatch')
 class UpdateFileView(View):
-    def put(self, request, *args, **kwargs):
-        # Extract the ID from the URL
-        file_id = kwargs.get('id')
-        
-        # Extract the file name from the query parameters
-        file_name = request.GET.get('file_name')
-        if not file_name:
-            return HttpResponseBadRequest("file_name is required.")
-        
-        file_content = request.FILES.get('file')
-        if not file_content:
+    def get(self, request, id):
+        article = get_object_or_404(Article, pk=id)
+        context = {
+            'article': article
+        }
+        print(article, article.headline)
+        return render(request, 'myapp/file_update.html', context=context)
+ 
+    def post(self, request, id):
+        article = get_object_or_404(Article, pk=id)
+
+        uploaded_file = request.FILES.get('file')
+        if not uploaded_file:
             return HttpResponseBadRequest("file is required.")
 
-        storage = HadoopStorage()
+        
+        old_filename = article.attachment.name
 
-        # Update the file in HDFS
-        try:
-            storage.update(file_id, file_name, file_content)
-            return JsonResponse({'message': 'File updated successfully.'})
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=500)
+        new_filename = article.attachment.storage.save(uploaded_file.name, uploaded_file)
+        article.attachment.name = new_filename
+        article.save()
+
+        article.attachment.storage.delete_signal(old_filename)
+
+        return HttpResponse(new_filename)
