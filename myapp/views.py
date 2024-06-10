@@ -62,4 +62,4 @@ class UpdateFileView(View):
 
         article.attachment.storage.delete_signal(old_filename)
 
-        return HttpResponse(new_filename)
+        return HttpResponse(f'{new_filename} added. Go to <a href="/articles">/articles</a>')

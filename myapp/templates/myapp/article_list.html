@@ -12,6 +12,7 @@
     {% for article in article_list %}
     <h3>{{ article.headline }}</h3>
     <img src="{{ article.attachment.url }}&{{ auth }}" width="300" alt="{{ article.attachment }}">
+    <a href="/update-file/{{ article.id }}/">Update Image</a>
     <hr>
     {% endfor %}
 {% else %}
