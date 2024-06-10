@@ -1,12 +1,18 @@
 from django.shortcuts import render
-
+from django.http import JsonResponse, HttpResponseBadRequest
+from django.views.decorators.http import require_http_methods
 # Create your views here.
 from django.http import HttpResponse
 from django.views import generic
 from .models import Article
+from django.utils.decorators import method_decorator
 from django.conf import settings
 import requests
 from requests_gssapi import HTTPSPNEGOAuth
+from storage import HadoopStorage 
+from django.views import View
+from django.shortcuts import get_object_or_404
+
 
 def index(request):
     return HttpResponse('''Hello, world. Please go to <a href="/articles"> /articles </a>''')
@@ -29,3 +35,31 @@ class ArticleListView(generic.ListView):
             context['auth'] = f'user.name={hadoop_user}'
 
         return context
+
+@method_decorator(require_http_methods(["POST", "GET"]), name='dispatch')
+class UpdateFileView(View):
+    def get(self, request, id):
+        article = get_object_or_404(Article, pk=id)
+        context = {
+            'article': article
+        }
+        print(article, article.headline)
+        return render(request, 'myapp/file_update.html', context=context)
+ 
+    def post(self, request, id):
+        article = get_object_or_404(Article, pk=id)
+
+        uploaded_file = request.FILES.get('file')
+        if not uploaded_file:
+            return HttpResponseBadRequest("file is required.")
+
+        
+        old_filename = article.attachment.name
+
+        new_filename = article.attachment.storage.save(uploaded_file.name, uploaded_file)
+        article.attachment.name = new_filename
+        article.save()
+
+        article.attachment.storage.delete_signal(old_filename)
+
+        return HttpResponse(f'{new_filename} added. Go to <a href="/articles">/articles</a>')

@@ -34,7 +34,6 @@ class HadoopStorage(Storage):
     # def _open(self, name, mode='rb'):
     #   pass
 
-
     def _save(self, name, content):
         # Save the file to HDFS
         with self.client.write(name, overwrite=True) as writer:
@@ -68,5 +67,3 @@ class HadoopStorage(Storage):
         # return url where contents of file can be accessed
         return f'http://{self.hadoop_host}:{self.hadoop_port}/webhdfs/v1/user/{self.hadoop_user}/{name}?op=OPEN' # Need to append authentication query param when rendering on client side, either user.name for simple auth, or delegation token for kerberos
         # return f'http://{self.hadoop_host}:{self.hadoop_port}/webhdfs/v1/user/{self.hadoop_user}/{name}?op=OPEN&user.name={self.hadoop_user}'
-    
-
